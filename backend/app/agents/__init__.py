@@ -8,14 +8,7 @@ from app.agents.against_agent import create_against_agent, AgainstAgent
 from app.agents.neutral_agent import create_neutral_agent, NeutralAgent
 from app.agents.judge_agent import create_judge_agent, JudgeAgent
 from app.agents.crew import create_fact_check_crew, FactCheckCrew
-
-from app.agents.tools.knowledge_tools import (
-    get_all_agent_tools,
-    create_evidence_search_tool,
-    create_fact_lookup_tool,
-    create_credibility_tool,
-    create_graph_query_tool
-)
+from app.agents.tools.knowledge_tools import get_all_agent_tools
 
 __all__ = [
     # Agents
@@ -26,9 +19,5 @@ __all__ = [
     # Crew
     "create_fact_check_crew", "FactCheckCrew",
     # Tools
-    "get_all_agent_tools",
-    "create_evidence_search_tool",
-    "create_fact_lookup_tool",
-    "create_credibility_tool",
-    "create_graph_query_tool"
+    "get_all_agent_tools"
 ]
