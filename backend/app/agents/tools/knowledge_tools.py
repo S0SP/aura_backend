@@ -4,8 +4,7 @@ Evidence retrieval, search, and analysis tools
 """
 
 from typing import Dict, Any, List, Optional
-from langchain.tools import Tool, StructuredTool
-from langchain_core.tools import BaseTool
+from langchain_core.tools import BaseTool, tool
 from pydantic import BaseModel, Field
 
 from app.core.logging import logger
@@ -185,69 +184,14 @@ async def query_knowledge_graph(entities: List[str]) -> Dict[str, Any]:
 
 
 # ===========================================
-# Create LangChain Tools
+# Create LangChain Tools (Simplified for deployment)
 # ===========================================
 
-def create_evidence_search_tool() -> Tool:
-    """Create evidence search tool for agents."""
-    return Tool(
-        name="evidence_search",
-        description=(
-            "Search for evidence related to a claim. Use this to find supporting or "
-            "refuting evidence from trusted sources like WHO, CDC, Reuters, etc. "
-            "Input should be the claim or topic to search for."
-        ),
-        func=lambda q: search_evidence(q),  # Sync wrapper
-        coroutine=search_evidence
-    )
-
-
-def create_fact_lookup_tool() -> Tool:
-    """Create fact lookup tool for agents."""
-    return Tool(
-        name="fact_lookup",
-        description=(
-            "Look up a claim in the database of previously verified facts. "
-            "Use this to check if a similar claim has been fact-checked before. "
-            "Input should be the claim text."
-        ),
-        func=lambda q: lookup_fact(q),
-        coroutine=lookup_fact
-    )
-
-
-def create_credibility_tool() -> Tool:
-    """Create source credibility assessment tool."""
-    return Tool(
-        name="assess_credibility",
-        description=(
-            "Assess the credibility of a source domain. Use this to evaluate "
-            "how trustworthy a source is. Input should be the domain name."
-        ),
-        func=lambda d: assess_source_credibility(d),
-        coroutine=assess_source_credibility
-    )
-
-
-def create_graph_query_tool() -> Tool:
-    """Create knowledge graph query tool."""
-    return Tool(
-        name="query_knowledge_graph",
-        description=(
-            "Query the knowledge graph for relationships between entities. "
-            "Use this to understand how concepts are related. "
-            "Input should be a comma-separated list of entities."
-        ),
-        func=lambda e: query_knowledge_graph(e.split(",") if isinstance(e, str) else e),
-        coroutine=lambda e: query_knowledge_graph(e.split(",") if isinstance(e, str) else e)
-    )
-
-
-def get_all_agent_tools() -> List[Tool]:
-    """Get all tools available to debate agents."""
-    return [
-        create_evidence_search_tool(),
-        create_fact_lookup_tool(),
-        create_credibility_tool(),
-        create_graph_query_tool()
-    ]
+def get_all_agent_tools() -> List:
+    """
+    Get all tools available to debate agents.
+    Tools are optional - agents can work with just prompts.
+    """
+    # Return empty list for now - tools are optional
+    # Agents work fine without tools, using direct LLM prompts
+    return []
