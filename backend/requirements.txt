@@ -1,0 +1,98 @@
+# ==========================================
+# AURA Fact-Checker - Python Dependencies
+# ==========================================
+# Install: pip install -r requirements.txt
+# Python 3.11+ required
+
+# === Core Framework ===
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+pydantic>=2.6.0
+pydantic-settings>=2.1.0
+python-multipart>=0.0.6
+
+# === LangChain & AI (Compatible versions) ===
+langchain>=0.3.0
+langchain-community>=0.3.0
+langchain-core>=0.3.0
+langchain-google-genai>=2.0.0
+langchain-groq>=0.2.0
+langgraph>=0.2.0
+
+# === CrewAI (Latest stable) ===
+crewai>=0.86.0
+
+# === LLM Providers (Free Options) ===
+google-generativeai>=0.8.0
+groq>=0.11.0
+
+# === Embeddings & Vector DB ===
+sentence-transformers>=3.0.0
+pinecone-client>=5.0.0
+
+# === Graph Database ===
+neo4j>=5.16.0
+
+# === Document Database ===
+pymongo>=4.6.1
+motor>=3.3.2
+
+# === Queue & Cache ===
+redis>=5.0.1
+celery>=5.3.6
+
+# === Web Scraping & Search ===
+serpapi>=0.1.5
+google-search-results>=2.4.2
+firecrawl-py>=1.0.0
+beautifulsoup4>=4.12.3
+requests>=2.31.0
+httpx>=0.27.0
+aiohttp>=3.9.1
+
+# === NLP & Text Processing ===
+spacy>=3.7.2
+transformers>=4.40.0
+tokenizers>=0.19.0
+
+# === OCR (Image Text Extraction) ===
+pytesseract>=0.3.10
+Pillow>=10.2.0
+
+# === Audio (ElevenLabs) ===
+elevenlabs>=1.0.0
+
+# === Facebook/WhatsApp Business API ===
+facebook-business>=19.0.0
+
+# === Authentication ===
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+
+# === Utilities ===
+python-dotenv>=1.0.0
+tenacity>=8.2.3
+tqdm>=4.66.1
+pandas>=2.1.4
+numpy>=1.26.0,<2.0.0
+uuid6>=2024.1.12
+
+# === Language Detection ===
+langdetect>=1.0.9
+
+# === Logging & Monitoring ===
+loguru>=0.7.2
+structlog>=24.1.0
+
+# === WebSocket ===
+websockets>=13.0
+
+# === Testing ===
+pytest>=8.0.0
+pytest-asyncio>=0.23.3
+pytest-cov>=4.1.0
+
+# === Development ===
+black>=24.1.0
+isort>=5.13.2
+flake8>=7.0.0

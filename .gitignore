@@ -1,0 +1,96 @@
+# ==========================================
+# Git Ignore File - AURA Fact-Checker
+# ==========================================
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment (CRITICAL - Large!)
+venv/
+.venv/
+ENV/
+env/
+backend/venv/
+backend/.venv/
+
+# Environment Variables (NEVER commit these!)
+.env
+.env.local
+.env.production
+*.env
+backend/.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+*.py,cover
+
+# Mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Logs
+logs/
+*.log
+backend/logs/
+
+# Data files
+data/facts/*.json
+data/models/*.pt
+data/models/*.pth
+data/models/*.bin
+*.h5
+backend/data/
+
+# Uploads
+uploads/
+temp/
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Misc
+*.bak
+*.tmp
+*.temp

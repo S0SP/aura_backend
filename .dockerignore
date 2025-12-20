@@ -1,0 +1,74 @@
+# ==========================================
+# Docker Ignore File - AURA Fact-Checker
+# ==========================================
+
+# Virtual Environment (CRITICAL - 1.3GB!)
+backend/venv/
+backend/.venv/
+**/venv/
+**/.venv/
+
+# Git
+.git
+.gitignore
+
+# Python cache
+**/__pycache__
+**/*.py[cod]
+**/*$py.class
+**/*.so
+.Python
+.eggs/
+**/*.egg-info/
+**/*.egg
+**/.mypy_cache/
+**/.pytest_cache/
+**/.coverage
+**/htmlcov/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment files
+backend/.env
+**/*.env
+.env.local
+
+# Logs
+**/logs/
+**/*.log
+
+# Tests
+backend/tests/
+**/test_*.py
+**/*_test.py
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Data files
+backend/data/
+**/*.csv
+!package.json
+
+# ML Models (large files)
+**/*.pt
+**/*.pth
+**/*.bin
+**/*.h5
+
+# Node modules (if any)
+**/node_modules/
+
+# Misc
+.DS_Store
+Thumbs.db
+*.bak
+*.tmp
+*.temp
+scripts/

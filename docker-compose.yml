@@ -1,0 +1,125 @@
+# ==========================================
+# AURA Fact-Checker - Docker Services
+# ==========================================
+# Run: docker-compose up -d
+# Stop: docker-compose down
+# Logs: docker-compose logs -f
+
+services:
+  # ==========================================
+  # MongoDB - Document Database
+  # ==========================================
+  mongodb:
+    image: mongo:7.0
+    container_name: aura_mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: aura_factchecker
+    volumes:
+      - mongodb_data:/data/db
+      - ./scripts/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - aura_network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ==========================================
+  # Redis - Caching & Queue
+  # ==========================================
+  redis:
+    image: redis:7-alpine
+    container_name: aura_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - aura_network
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==========================================
+  # Neo4j - Graph Database
+  # ==========================================
+  neo4j:
+    image: neo4j:5.15-community
+    container_name: aura_neo4j
+    restart: unless-stopped
+    ports:
+      - "7474:7474" # HTTP Browser
+      - "7687:7687" # Bolt Protocol
+    environment:
+      NEO4J_AUTH: neo4j/aura_neo4j_password
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_dbms_security_procedures_unrestricted: apoc.*
+      NEO4J_dbms_memory_heap_initial__size: 256m
+      NEO4J_dbms_memory_heap_max__size: 512m
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+    networks:
+      - aura_network
+    healthcheck:
+      test: wget -q --spider http://localhost:7474 || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+  # ==========================================
+  # AURA Backend API
+  # ==========================================
+  aura-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aura_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app
+      - ./backend/logs:/app/logs
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+    networks:
+      - aura_network
+    healthcheck:
+      test: curl -f http://localhost:8000/health || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  aura_network:
+    driver: bridge
+    name: aura_network
+
+volumes:
+  mongodb_data:
+    name: aura_mongodb_data
+  redis_data:
+    name: aura_redis_data
+  neo4j_data:
+    name: aura_neo4j_data
+  neo4j_logs:
+    name: aura_neo4j_logs
