@@ -64,12 +64,18 @@ class PineconeSearch:
             return {"matches": [], "error": str(e)}
     
     async def _get_embedding(self, text: str) -> List[float]:
-        """Generate embedding using sentence-transformers."""
+        """Generate embedding using Google Generative AI (lightweight, API-based)."""
         try:
-            from sentence_transformers import SentenceTransformer
-            model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
-            embedding = model.encode(text).tolist()
-            return embedding
+            import google.generativeai as genai
+            from app.core.config import settings
+            
+            genai.configure(api_key=settings.GOOGLE_API_KEY)
+            result = genai.embed_content(
+                model="models/embedding-001",
+                content=text,
+                task_type="retrieval_query"
+            )
+            return result['embedding']
         except Exception as e:
             logger.error(f"Embedding generation failed: {e}")
             return []

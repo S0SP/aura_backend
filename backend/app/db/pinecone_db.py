@@ -223,44 +223,50 @@ async def get_index_stats() -> Dict[str, Any]:
 # Embedding Generation
 # ===========================================
 
-_embedding_model = None
+_genai_configured = False
 
 
-def get_embedding_model():
-    """Get or load the embedding model."""
-    global _embedding_model
-    
-    if _embedding_model is None:
+def _configure_genai():
+    """Configure Google Generative AI for embeddings."""
+    global _genai_configured
+    if not _genai_configured:
         try:
-            from sentence_transformers import SentenceTransformer
-            logger.info(f"Loading embedding model: {settings.EMBEDDING_MODEL}")
-            _embedding_model = SentenceTransformer(settings.EMBEDDING_MODEL)
-            logger.info("✅ Embedding model loaded")
-        except ImportError:
-            logger.error("sentence-transformers not installed")
-            raise
-    
-    return _embedding_model
+            import google.generativeai as genai
+            genai.configure(api_key=settings.GOOGLE_API_KEY)
+            _genai_configured = True
+            logger.info("✅ Google Generative AI configured for embeddings")
+        except Exception as e:
+            logger.error(f"Failed to configure Google Generative AI: {e}")
 
 
 def generate_embedding(text: str) -> List[float]:
     """
-    Generate embedding for text.
+    Generate embedding for text using Google Generative AI.
     
     Args:
         text: Text to embed
         
     Returns:
-        Embedding vector
+        Embedding vector (768 dimensions)
     """
-    model = get_embedding_model()
-    embedding = model.encode(text, convert_to_numpy=True)
-    return embedding.tolist()
+    try:
+        import google.generativeai as genai
+        _configure_genai()
+        
+        result = genai.embed_content(
+            model="models/embedding-001",
+            content=text,
+            task_type="retrieval_document"
+        )
+        return result['embedding']
+    except Exception as e:
+        logger.error(f"Embedding generation failed: {e}")
+        return []
 
 
 def generate_embeddings(texts: List[str]) -> List[List[float]]:
     """
-    Generate embeddings for multiple texts.
+    Generate embeddings for multiple texts using Google Generative AI.
     
     Args:
         texts: List of texts to embed
@@ -268,9 +274,22 @@ def generate_embeddings(texts: List[str]) -> List[List[float]]:
     Returns:
         List of embedding vectors
     """
-    model = get_embedding_model()
-    embeddings = model.encode(texts, convert_to_numpy=True)
-    return embeddings.tolist()
+    try:
+        import google.generativeai as genai
+        _configure_genai()
+        
+        embeddings = []
+        for text in texts:
+            result = genai.embed_content(
+                model="models/embedding-001",
+                content=text,
+                task_type="retrieval_document"
+            )
+            embeddings.append(result['embedding'])
+        return embeddings
+    except Exception as e:
+        logger.error(f"Batch embedding generation failed: {e}")
+        return []
 
 
 # ===========================================
