@@ -13,8 +13,8 @@ from langchain_groq import ChatGroq
 from app.core.logging import logger
 from app.core.config import settings
 from app.agents.prompts.neutral_agent_prompts import (
-    get_neutral_system_prompt,
-    get_neutral_round_prompt
+    get_neutral_agent_prompt,
+    NEUTRAL_AGENT_SYSTEM
 )
 from app.agents.tools.knowledge_tools import get_all_agent_tools
 
@@ -34,7 +34,7 @@ class NeutralAgent:
         """Initialize the CrewAI agent."""
         llm = self._get_llm()
         tools = get_all_agent_tools()
-        system_prompt = get_neutral_system_prompt(self.category)
+        system_prompt = NEUTRAL_AGENT_SYSTEM
         
         self.agent = Agent(
             role="Analyst",
@@ -99,10 +99,12 @@ class NeutralAgent:
         )
         
         try:
-            prompt = get_neutral_round_prompt(
-                round_number=round_number,
+            prompt = get_neutral_agent_prompt(
                 claim=claim,
-                context=context
+                round_number=round_number,
+                exchange_number=1,
+                for_arguments=[{"argument": for_argument}] if for_argument else None,
+                against_arguments=[{"argument": against_argument}] if against_argument else None
             )
             
             response = await self._execute_agent(prompt)

@@ -13,8 +13,8 @@ from langchain_groq import ChatGroq
 from app.core.logging import logger
 from app.core.config import settings
 from app.agents.prompts.for_agent_prompts import (
-    get_for_system_prompt,
-    get_for_round_prompt
+    get_for_agent_prompt,
+    FOR_AGENT_SYSTEM
 )
 from app.agents.tools.knowledge_tools import get_all_agent_tools
 
@@ -39,7 +39,7 @@ class ForAgent:
         tools = get_all_agent_tools()
         
         # Get system prompt based on claim category
-        system_prompt = get_for_system_prompt(self.category)
+        system_prompt = FOR_AGENT_SYSTEM
         
         self.agent = Agent(
             role="Advocate",
@@ -111,10 +111,12 @@ class ForAgent:
         
         try:
             # Get round-specific prompt
-            prompt = get_for_round_prompt(
-                round_number=round_number,
+            prompt = get_for_agent_prompt(
                 claim=claim,
-                context=context
+                round_number=round_number,
+                exchange_number=1,
+                previous_exchanges=previous_exchanges,
+                evidence=evidence
             )
             
             # Use CrewAI agent (simplified execution)

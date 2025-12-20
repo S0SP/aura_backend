@@ -13,9 +13,9 @@ from langchain_groq import ChatGroq
 from app.core.logging import logger
 from app.core.config import settings
 from app.agents.prompts.judge_agent_prompts import (
-    get_judge_system_prompt,
-    get_judge_round_evaluation_prompt,
-    get_judge_final_verdict_prompt
+    JUDGE_AGENT_SYSTEM,
+    get_round_scoring_prompt,
+    get_final_verdict_prompt
 )
 from app.agents.tools.knowledge_tools import get_all_agent_tools
 
@@ -37,7 +37,7 @@ class JudgeAgent:
         """Initialize the CrewAI agent."""
         llm = self._get_llm()
         tools = get_all_agent_tools()
-        system_prompt = get_judge_system_prompt(self.category)
+        system_prompt = JUDGE_AGENT_SYSTEM
         
         self.agent = Agent(
             role="Judge",
@@ -98,10 +98,16 @@ class JudgeAgent:
         )
         
         try:
-            prompt = get_judge_round_evaluation_prompt(
+            # Extract arguments from exchanges
+            for_args = [ex for ex in exchanges if ex.get('agent') == 'for']
+            against_args = [ex for ex in exchanges if ex.get('agent') == 'against']
+            neutral_analysis = next((ex.get('analysis', '') for ex in exchanges if ex.get('agent') == 'neutral'), '')
+            
+            prompt = get_round_scoring_prompt(
                 round_number=round_number,
-                claim=claim,
-                context=context
+                for_arguments=for_args,
+                against_arguments=against_args,
+                neutral_analysis=neutral_analysis
             )
             
             response = await self._execute_agent(prompt)
@@ -147,9 +153,23 @@ class JudgeAgent:
         )
         
         try:
-            prompt = get_judge_final_verdict_prompt(
+            # Calculate totals
+            for_total = sum(
+                rd.get('scores', {}).get('for_agent', {}).get('weighted_total', 0)
+                for rd in all_rounds
+            )
+            against_total = sum(
+                rd.get('scores', {}).get('against_agent', {}).get('weighted_total', 0)
+                for rd in all_rounds
+            )
+            
+            prompt = get_final_verdict_prompt(
                 claim=claim,
-                context=context
+                quick_classification=quick_classification or {},
+                round_scores=all_rounds,
+                for_total=for_total,
+                against_total=against_total,
+                key_evidence=[]
             )
             
             response = await self._execute_agent(prompt)

@@ -13,8 +13,8 @@ from langchain_groq import ChatGroq
 from app.core.logging import logger
 from app.core.config import settings
 from app.agents.prompts.against_agent_prompts import (
-    get_against_system_prompt,
-    get_against_round_prompt
+    get_against_agent_prompt,
+    AGAINST_AGENT_SYSTEM
 )
 from app.agents.tools.knowledge_tools import get_all_agent_tools
 
@@ -34,7 +34,7 @@ class AgainstAgent:
         """Initialize the CrewAI agent with LLM and tools."""
         llm = self._get_llm()
         tools = get_all_agent_tools()
-        system_prompt = get_against_system_prompt(self.category)
+        system_prompt = AGAINST_AGENT_SYSTEM
         
         self.agent = Agent(
             role="Skeptic",
@@ -99,10 +99,12 @@ class AgainstAgent:
         )
         
         try:
-            prompt = get_against_round_prompt(
-                round_number=round_number,
+            prompt = get_against_agent_prompt(
                 claim=claim,
-                context=context
+                round_number=round_number,
+                exchange_number=1,
+                previous_exchanges=previous_exchanges,
+                evidence=evidence
             )
             
             response = await self._execute_agent(prompt)
